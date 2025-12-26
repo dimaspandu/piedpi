@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Http\JsonResponse;
 use App\Core\Renderer;
+use App\Core\View\TemplateCache;
 
 /**
  * Class HomeController
@@ -47,6 +48,27 @@ class HomeController
     Renderer::chunk('</html>');
 
     Renderer::end();
+  }
+
+  public function cached(): void
+  {
+    $key = 'home_page';
+
+    if ($cached = TemplateCache::get($key)) {
+      echo $cached;
+      return;
+    }
+
+    ob_start();
+
+    Renderer::start();
+    Renderer::chunk('<h1>Hello Cached</h1>');
+    Renderer::end();
+
+    $html = ob_get_clean();
+
+    TemplateCache::put($key, $html);
+    echo $html;
   }
 
   public function api(): JsonResponse

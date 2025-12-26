@@ -45,6 +45,7 @@ require dirname(__DIR__) . '/bootstrap.php';
 use App\Core\Router;
 use App\Controllers\HomeController;
 use App\Controllers\AboutController;
+use App\Controllers\HealthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,8 +54,10 @@ use App\Controllers\AboutController;
 */
 $router = new Router();
 $router->get('/', [HomeController::class, 'index']);
+$router->get('/hello-cached', [HomeController::class, 'cached']);
 $router->post('/api/test', [HomeController::class, 'api']);
 $router->get('/about', [AboutController::class, 'index']);
+$router->get('/health', [HealthController::class, 'check']);
 
 /*
 |--------------------------------------------------------------------------

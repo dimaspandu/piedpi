@@ -6,6 +6,7 @@ namespace App\Core;
 
 use App\Core\ErrorHandler;
 use App\Core\Http\Response;
+use App\Core\Middleware\ErrorBoundary;
 
 /**
  * Class Router
@@ -116,10 +117,12 @@ class Router
       return;
     }
 
-    $this->executeHandler(
-      $currentNode->handlers[$requestMethod],
-      $params
-    );
+    $handler  = $currentNode->handlers[$requestMethod];
+    $boundary = new ErrorBoundary();
+
+    $boundary->handle(function () use ($handler, $params) {
+      $this->executeHandler($handler, $params);
+    });
   }
 
   /**
