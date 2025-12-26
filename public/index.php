@@ -6,46 +6,27 @@ declare(strict_types=1);
 |--------------------------------------------------------------------------
 | Global Exception Boundary (EARLY)
 |--------------------------------------------------------------------------
-| Catches all uncaught exceptions including bootstrap failures.
 */
 set_exception_handler(function (Throwable $e): void {
-  // Delegate to ErrorHandler after autoload is available
   if (class_exists(\App\Core\ErrorHandler::class)) {
     \App\Core\ErrorHandler::handle($e);
     return;
   }
 
-  // Fallback (very early failure)
   http_response_code(500);
   error_log((string) $e);
-
-  echo <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Server Error</title>
-</head>
-<body>
-  <h1>500 - Server Error</h1>
-  <p>Something went wrong.</p>
-</body>
-</html>
-HTML;
+  echo '<h1>500 - Server Error</h1>';
   exit;
 });
 
 /*
 |--------------------------------------------------------------------------
-| Bootstrap Application
+| Bootstrap
 |--------------------------------------------------------------------------
 */
 require dirname(__DIR__) . '/bootstrap.php';
 
 use App\Core\Router;
-use App\Controllers\HomeController;
-use App\Controllers\AboutController;
-use App\Controllers\HealthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,15 +34,13 @@ use App\Controllers\HealthController;
 |--------------------------------------------------------------------------
 */
 $router = new Router();
-$router->get('/', [HomeController::class, 'index']);
-$router->get('/hello-cached', [HomeController::class, 'cached']);
-$router->post('/api/test', [HomeController::class, 'api']);
-$router->get('/about', [AboutController::class, 'index']);
-$router->get('/health', [HealthController::class, 'check']);
+
+require dirname(__DIR__) . '/routes/web.php';
+require dirname(__DIR__) . '/routes/api.php';
 
 /*
 |--------------------------------------------------------------------------
-| Dispatch Request
+| Dispatch
 |--------------------------------------------------------------------------
 */
 $router->dispatch();
