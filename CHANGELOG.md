@@ -1,6 +1,16 @@
 # Changelog
 
-## [1.0.0] - 2025-12-26
+## [1.0.1] - Database Core
+
+### Added
+- Safe PDO wrapper
+- Centralized database connection
+- Transaction boundary
+- Database exception isolation
+
+---
+
+## [1.0.0] - Initial Release
 
 ### Added
 - Trie-based HTTP router with dynamic parameters

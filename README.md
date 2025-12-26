@@ -208,12 +208,45 @@ php tests/run.php
 Example output:
 
 ```
-[PASS] Router matches static route
-[PASS] Router matches dynamic parameter
-[FAIL] Router returns 404 for unknown route
+WidgetTest passed
+RouterTest passed
+DatabaseTest passed
+
+✅ All tests passed
 ```
 
-This setup is intentionally simple and designed to be readable before being powerful.
+#### Skipping Tests
+
+Some tests (such as database-related tests) may require additional system dependencies.
+You can skip specific tests using the --skip flag:
+
+```bash
+php tests/run.php --skip=database
+```
+
+Example output:
+
+```
+⏭  Skipped databasetest.php
+WidgetTest passed
+RouterTest passed
+
+✅ All tests passed
+```
+
+You can skip multiple tests by providing a comma-separated list:
+
+```bash
+php tests/run.php --skip=database,router
+```
+
+The test runner is intentionally minimal:
+
+* No external testing framework
+* No annotations or magic
+* Fully readable in a single file
+
+This design keeps the testing layer transparent, hackable, and easy to evolve as the project grows.
 
 ---
 
