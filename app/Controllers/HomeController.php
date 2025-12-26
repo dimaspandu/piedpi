@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Http\JsonResponse;
 use App\Core\Renderer;
 
 /**
@@ -46,5 +47,13 @@ class HomeController
     Renderer::chunk('</html>');
 
     Renderer::end();
+  }
+
+  public function api(): JsonResponse
+  {
+    return new JsonResponse([
+      'status' => 'ok',
+      'time' => time(),
+    ]);
   }
 }

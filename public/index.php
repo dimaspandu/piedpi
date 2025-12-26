@@ -53,6 +53,7 @@ use App\Controllers\AboutController;
 */
 $router = new Router();
 $router->get('/', [HomeController::class, 'index']);
+$router->post('/api/test', [HomeController::class, 'api']);
 $router->get('/about', [AboutController::class, 'index']);
 
 /*

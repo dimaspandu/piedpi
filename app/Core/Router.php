@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Core\ErrorHandler;
+use App\Core\Http\Response;
 
 /**
  * Class Router
@@ -30,6 +31,26 @@ class Router
   public function get(string $path, callable|array $handler): void
   {
     $this->addRoute('GET', $path, $handler);
+  }
+
+  public function post(string $path, callable|array $handler): void
+  {
+    $this->addRoute('POST', $path, $handler);
+  }
+
+  public function put(string $path, callable|array $handler): void
+  {
+    $this->addRoute('PUT', $path, $handler);
+  }
+
+  public function patch(string $path, callable|array $handler): void
+  {
+    $this->addRoute('PATCH', $path, $handler);
+  }
+
+  public function delete(string $path, callable|array $handler): void
+  {
+    $this->addRoute('DELETE', $path, $handler);
   }
 
   /**
@@ -107,11 +128,14 @@ class Router
   private function executeHandler(callable|array $handler, array $params): void
   {
     if (is_array($handler)) {
-      [$controllerClass, $controllerMethod] = $handler;
-      (new $controllerClass())->$controllerMethod($params);
-      return;
+      [$class, $method] = $handler;
+      $result = (new $class())->$method($params);
+    } else {
+      $result = call_user_func($handler, $params);
     }
 
-    call_user_func($handler, $params);
+    if ($result instanceof Response) {
+      $result->send();
+    }
   }
 }
