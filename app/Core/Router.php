@@ -13,6 +13,11 @@ use App\Core\Middleware\ErrorBoundary;
  *
  * Handles HTTP request routing using a Trie-based structure.
  * Supports static paths and dynamic parameters.
+ *
+ * The router is intentionally framework-agnostic:
+ * - No dependency injection container
+ * - No middleware stacks
+ * - Explicit control flow
  */
 class Router
 {
@@ -34,21 +39,33 @@ class Router
     $this->addRoute('GET', $path, $handler);
   }
 
+  /**
+   * Register a POST route.
+   */
   public function post(string $path, callable|array $handler): void
   {
     $this->addRoute('POST', $path, $handler);
   }
 
+  /**
+   * Register a PUT route.
+   */
   public function put(string $path, callable|array $handler): void
   {
     $this->addRoute('PUT', $path, $handler);
   }
 
+  /**
+   * Register a PATCH route.
+   */
   public function patch(string $path, callable|array $handler): void
   {
     $this->addRoute('PATCH', $path, $handler);
   }
 
+  /**
+   * Register a DELETE route.
+   */
   public function delete(string $path, callable|array $handler): void
   {
     $this->addRoute('DELETE', $path, $handler);
@@ -56,6 +73,8 @@ class Router
 
   /**
    * Register a route into the trie.
+   *
+   * Dynamic parameters are represented internally as "*".
    */
   private function addRoute(
     string $httpMethod,
@@ -85,6 +104,12 @@ class Router
 
   /**
    * Dispatch the current HTTP request.
+   *
+   * Responsible for:
+   * - Path matching
+   * - Parameter extraction
+   * - Error handling
+   * - Response sending
    */
   public function dispatch(): void
   {
@@ -127,6 +152,9 @@ class Router
 
   /**
    * Execute the matched route handler.
+   *
+   * If the handler returns a Response object,
+   * it will be sent automatically.
    */
   private function executeHandler(callable|array $handler, array $params): void
   {

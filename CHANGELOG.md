@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.0.2] – HTTP Layer & Middleware Completion
+
+### Added
+- Error boundary middleware for safe request execution
+- Full HTTP response abstraction (JSON, Stream, File)
+- Support for HTTP methods beyond GET (POST, PUT, PATCH, DELETE)
+- API routing separation (`routes/web.php` & `routes/api.php`)
+- Health check endpoint (`/health`)
+- Basic request payload handling (JSON body & query string)
+
+### Improved
+- Router execution flow with centralized response sending
+- Controller clarity between web and API responses
+- Public entrypoint readability and route organization
+
+### Notes
+This release completes the **HTTP and middleware layer** of Piedpi.
+The system now supports REST-style APIs while keeping rendering
+explicit and framework-free.
+
+---
+
 ## [1.0.1] - Database Core
 
 ### Added
