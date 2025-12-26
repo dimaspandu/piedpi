@@ -138,37 +138,6 @@ Environment variables are loaded via `.env` files during bootstrap, keeping secr
 
 ---
 
-## Engineering Considerations
-
-### Separation of Concerns
-
-Each class and file has a narrow responsibility. Controllers do not handle routing. The Router does not render views. Rendering logic does not manage application state.
-
-### Explicit Control Flow
-
-There are no implicit lifecycle hooks. If code executes, it is because it was called directly.
-
-### Performance
-
-* No reflection
-* No container resolution
-* Minimal runtime overhead
-
-This makes the codebase suitable for low-latency environments and easy profiling.
-
-### Computer Science Concepts
-
-The project demonstrates practical use of:
-
-* Trie data structures for routing
-* Deterministic state transitions
-* Stateless request handling
-* Controlled side effects
-
-These ideas map directly to how larger frameworks work internally.
-
----
-
 ## Running the Project
 
 Requirements:
@@ -186,6 +155,65 @@ Then open:
 ```
 http://localhost:8888
 ```
+
+---
+
+## Testing
+
+Piedpi includes a **minimal, dependency-free testing setup** to keep the codebase lightweight and educational.
+
+The goal of testing here is not to replace PHPUnit, but to:
+
+* Demonstrate how unit testing works internally
+* Keep control flow explicit
+* Avoid magic bootstrapping or hidden globals
+
+### Test Structure
+
+```
+/tests
+  ├── bootstrap.php
+  ├── run.php
+  └── RouterTest.php
+```
+
+* `bootstrap.php`
+  Initializes the test environment and defines basic assertion helpers.
+
+* `*Test.php`
+  Each file contains one logical unit test group.
+
+* `run.php`
+  Discovers and executes all test files.
+
+### Assertion Helpers
+
+Assertions are implemented as simple functions, for example:
+
+* `assertTrue($condition, $message)`
+* `assertEquals($expected, $actual, $message)`
+
+They throw exceptions on failure, making test failures explicit and easy to debug.
+
+> Note: Assertion functions must only be declared **once** in `tests/bootstrap.php` to avoid redeclaration errors.
+
+### Running Tests
+
+Run all tests using:
+
+```bash
+php tests/run.php
+```
+
+Example output:
+
+```
+[PASS] Router matches static route
+[PASS] Router matches dynamic parameter
+[FAIL] Router returns 404 for unknown route
+```
+
+This setup is intentionally simple and designed to be readable before being powerful.
 
 ---
 

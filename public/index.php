@@ -44,6 +44,7 @@ require dirname(__DIR__) . '/bootstrap.php';
 
 use App\Core\Router;
 use App\Controllers\HomeController;
+use App\Controllers\AboutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,7 @@ use App\Controllers\HomeController;
 */
 $router = new Router();
 $router->get('/', [HomeController::class, 'index']);
+$router->get('/about', [AboutController::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------

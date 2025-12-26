@@ -25,6 +25,19 @@ class HomeController
       widget('h1', null, 'Streaming Content')
     );
 
+    // Simulate network / rendering delay
+    usleep(500_000);
+
+    Renderer::chunk('<p>Step 2</p>');
+    
+    // Simulate network / rendering delay
+    usleep(500_000);
+
+    Renderer::chunk('<p>Step 3</p>');
+    
+    // Simulate network / rendering delay
+    usleep(500_000);
+
     Renderer::view(
       dirname(__DIR__) . '/Views/partial.php'
     );
