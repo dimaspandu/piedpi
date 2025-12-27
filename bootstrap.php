@@ -4,6 +4,38 @@ declare(strict_types=1);
 
 /*
 |--------------------------------------------------------------------------
+| Load Environment Variables (Minimal)
+|--------------------------------------------------------------------------
+| No external dependency.
+| Only loads simple KEY=VALUE pairs.
+*/
+$envFile = __DIR__ . '/.env';
+
+if (is_file($envFile)) {
+  foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+    if (str_starts_with(trim($line), '#')) {
+      continue;
+    }
+
+    [$key, $value] = array_map('trim', explode('=', $line, 2));
+
+    $_ENV[$key] = $value;
+    $_SERVER[$key] = $value;
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Application Base Path
+|--------------------------------------------------------------------------
+*/
+define(
+  'APP_BASE_PATH',
+  rtrim($_ENV['APP_BASE_PATH'] ?? '', '/')
+);
+
+/*
+|--------------------------------------------------------------------------
 | Autoloader (PSR-4 like, no Composer)
 |--------------------------------------------------------------------------
 */

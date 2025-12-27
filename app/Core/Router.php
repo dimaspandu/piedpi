@@ -9,14 +9,17 @@ use App\Core\Http\Response;
 use App\Core\Middleware\ErrorBoundary;
 
 /**
- * Class Router
+ * Lightweight HTTP Router using a Trie-based structure.
  *
- * Handles HTTP request routing using a Trie-based structure.
- * Supports static paths and dynamic parameters.
+ * Responsibilities:
+ * - HTTP method matching
+ * - Path resolution
+ * - Dynamic parameter extraction
+ * - Error boundary execution
  *
- * The router is intentionally framework-agnostic:
- * - No dependency injection container
- * - No middleware stacks
+ * Intentionally framework-agnostic:
+ * - No container
+ * - No auto-wiring
  * - Explicit control flow
  */
 class Router
@@ -72,9 +75,10 @@ class Router
   }
 
   /**
-   * Register a route into the trie.
+   * Add a route definition into the trie.
    *
-   * Dynamic parameters are represented internally as "*".
+   * Dynamic parameters are stored internally using "*"
+   * Example: /users/:id
    */
   private function addRoute(
     string $httpMethod,
@@ -87,7 +91,7 @@ class Router
     foreach ($segments as $segment) {
       $key = $segment;
 
-      // Dynamic parameter (e.g. /users/:id)
+      // Dynamic parameter segment
       if (str_starts_with($segment, ':')) {
         $key = '*';
         $currentNode->children[$key] ??= new TrieNode();
@@ -105,17 +109,35 @@ class Router
   /**
    * Dispatch the current HTTP request.
    *
-   * Responsible for:
-   * - Path matching
-   * - Parameter extraction
-   * - Error handling
-   * - Response sending
+   * Handles:
+   * - Base path normalization
+   * - Route matching
+   * - Parameter binding
+   * - Error boundary execution
    */
   public function dispatch(): void
   {
     $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $requestPath   = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 
+    /*
+    |--------------------------------------------------------------------------
+    | Normalize Base Path
+    |--------------------------------------------------------------------------
+    */
+    $basePath = defined('APP_BASE_PATH') ? APP_BASE_PATH : '';
+
+    if ($basePath !== '' && str_starts_with($requestPath, $basePath)) {
+      $requestPath = substr($requestPath, strlen($basePath));
+    }
+
+    $requestPath = '/' . trim($requestPath, '/');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Match Route
+    |--------------------------------------------------------------------------
+    */
     $segments = explode('/', trim($requestPath, '/'));
     $params   = [];
 
@@ -151,9 +173,9 @@ class Router
   }
 
   /**
-   * Execute the matched route handler.
+   * Execute the resolved route handler.
    *
-   * If the handler returns a Response object,
+   * If the handler returns a Response instance,
    * it will be sent automatically.
    */
   private function executeHandler(callable|array $handler, array $params): void
