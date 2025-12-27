@@ -37,12 +37,11 @@ use App\Core\Router;
 */
 $router = new Router();
 
-require dirname(__DIR__) . '/routes/web.php';
-require dirname(__DIR__) . '/routes/api.php';
+require __DIR__ . '/routes/web.php';
 
 /*
 |--------------------------------------------------------------------------
-| Dispatch
+| Dispatch Request
 |--------------------------------------------------------------------------
 */
 $router->dispatch();

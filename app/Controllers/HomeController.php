@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Http\JsonResponse;
 use App\Core\Renderer;
 use App\Core\View\TemplateCache;
 
@@ -50,7 +49,7 @@ class HomeController
     Renderer::end();
   }
 
-  public function cached(): void
+  public function hello(): void
   {
     $key = 'home_page';
 
@@ -69,13 +68,5 @@ class HomeController
 
     TemplateCache::put($key, $html);
     echo $html;
-  }
-
-  public function api(): JsonResponse
-  {
-    return new JsonResponse([
-      'status' => 'ok',
-      'time' => time(),
-    ]);
   }
 }

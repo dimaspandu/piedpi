@@ -22,7 +22,7 @@ final class TemplateCache
   /**
    * Directory where cached templates are stored.
    */
-  private static string $dir = __DIR__ . '/../../../storage/cache';
+  private static string $dir = __DIR__ . '/../../../../storage/cache';
 
   /**
    * Retrieve cached content by key.
