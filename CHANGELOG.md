@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.0.3] – View Layer Refinement & Widget Enhancement
+
+### Added
+- Self-closing HTML tag support in Widget renderer (`br/`, `hr/`, etc.)
+- Recursive widget children handling (string, array, nested widgets)
+- Safe mixed-content rendering (escaped text + trusted widget output)
+- Asset routing support for non-public front controller setups
+
+### Improved
+- Widget rendering flexibility for complex semantic layouts
+- HTML composition without introducing a template engine
+- View-layer ergonomics for progressive HTML streaming
+- Consistency between streamed chunks and full view rendering
+
+### Notes
+This release strengthens the **view and composition layer** of Piedpi.
+Widgets can now express complex, semantic HTML structures while
+remaining framework-free, stream-safe, and predictable.
+
+---
+
 ## [1.0.2] – HTTP Layer & Middleware Completion
 
 ### Added

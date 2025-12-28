@@ -16,17 +16,26 @@ class Widget
    *
    * @param string $tag
    * @param array<string, mixed>|null $attributes
-   * @param array<string>|string|null $children
+   * @param mixed $children
    */
   public static function render(
     string $tag,
     ?array $attributes = null,
-    array|string|null $children = null
+    mixed $children = null
   ): string {
+    // Detect self-closing tag (e.g. br/, hr/)
+    $isSelfClosing = str_ends_with($tag, '/');
+    $tagName = $isSelfClosing ? rtrim($tag, '/') : $tag;
+
     $attrString = self::buildAttributes($attributes);
+
+    if ($isSelfClosing) {
+      return "<{$tagName}{$attrString} />";
+    }
+
     $content = self::buildChildren($children);
 
-    return "<{$tag}{$attrString}>{$content}</{$tag}>";
+    return "<{$tagName}{$attrString}>{$content}</{$tagName}>";
   }
 
   /**
@@ -64,26 +73,41 @@ class Widget
   /**
    * Build HTML children content.
    *
-   * @param array<string>|string|null $children
+   * Rules:
+   * - string → escaped
+   * - array → recursive
+   * - widget output (string with "<") → trusted
+   *
+   * @param mixed $children
    */
-  private static function buildChildren(array|string|null $children): string
+  private static function buildChildren(mixed $children): string
   {
     if ($children === null) {
       return '';
     }
 
+    // Plain string
     if (is_string($children)) {
+      // If contains HTML tags, assume it's widget output (trusted)
+      if (str_contains($children, '<')) {
+        return $children;
+      }
+
       return htmlspecialchars($children, ENT_QUOTES, 'UTF-8');
     }
 
-    $output = '';
+    // Array of children
+    if (is_array($children)) {
+      $output = '';
 
-    foreach ($children as $child) {
-      $output .= is_string($child)
-        ? htmlspecialchars($child, ENT_QUOTES, 'UTF-8')
-        : $child;
+      foreach ($children as $child) {
+        $output .= self::buildChildren($child);
+      }
+
+      return $output;
     }
 
-    return $output;
+    // Fallback (should not happen)
+    return '';
   }
 }
