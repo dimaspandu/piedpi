@@ -26,12 +26,31 @@ if (is_file($envFile)) {
 
 /*
 |--------------------------------------------------------------------------
-| Application Base Path
+| Environment Helper
+|--------------------------------------------------------------------------
+| Centralized env access with default values.
+*/
+function env(string $key, mixed $default = null): mixed
+{
+  return $_ENV[$key] ?? $default;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Application Constants
 |--------------------------------------------------------------------------
 */
+define('APP_ENV', env('APP_ENV', 'production'));
+define('APP_DEBUG', env('APP_DEBUG', 'false') === 'true');
+
 define(
   'APP_BASE_PATH',
-  rtrim($_ENV['APP_BASE_PATH'] ?? '', '/')
+  rtrim(env('APP_BASE_PATH', '/'), '/')
+);
+
+define(
+  'APP_BASE_URL',
+  env('APP_BASE_URL', 'http://localhost' . APP_BASE_PATH)
 );
 
 /*
