@@ -15,7 +15,7 @@ return [
   |--------------------------------------------------------------------------
   | Supported values: development, production
   */
-  'env' => getenv('APP_ENV') ?: 'development',
+  'env' => env('APP_ENV', 'development'),
 
   /*
   |--------------------------------------------------------------------------
@@ -24,5 +24,5 @@ return [
   | When enabled, detailed errors may be logged internally.
   | Errors must never be displayed to end users in production.
   */
-  'debug' => getenv('APP_DEBUG') === 'true',
+  'debug' => env('APP_DEBUG', false),
 ];

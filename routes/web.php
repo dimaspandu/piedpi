@@ -11,9 +11,20 @@ use App\Controllers\ErrorController;
 
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/hello', [HomeController::class, 'hello']);
-$router->get('/_debug/500', function () {
-  throw new Exception('Forced 500 error');
-});
+
+/*
+|--------------------------------------------------------------------------
+| Error Handler Test Routes (Development Only)
+|--------------------------------------------------------------------------
+*/
+if (
+  env('APP_ENV') === 'development' &&
+  env('APP_DEBUG') === true
+) {
+  $router->get('/_debug/500', function () {
+    throw new Exception('Forced 500 error');
+  });
+}
 
 /*
 |--------------------------------------------------------------------------
