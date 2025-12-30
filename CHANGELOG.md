@@ -1,5 +1,49 @@
 # Changelog
 
+## [1.0.6] – Database Configuration & PDO Abstraction Foundation
+
+### Added
+- Environment-based database configuration via `config/database.php`
+- Centralized PDO connection factory (`Connection::get()`)
+- Safe static database facade (`DB`) for read-only queries
+- Development-only database test route (`/_debug/db/items`)
+- Explicit separation between:
+  - Configuration
+  - Connection lifecycle
+  - Query execution
+
+### Improved
+- Removal of hardcoded database credentials from application logic
+- Consistent environment access via `env()` across app & database layers
+- Safer database experimentation without affecting production routes
+- Clear upgrade path from raw PDO usage to structured DB abstraction
+
+### Notes
+This release introduces the **database foundation layer** of Piedpi.
+
+Instead of tightly coupling controllers to PDO, database access is now:
+- Centralized
+- Environment-aware
+- Replaceable without touching controllers
+
+The new DB facade intentionally exposes **minimal surface area**:
+- No ORM
+- No query builder
+- No magic state
+
+This preserves Piedpi’s core principles:
+- Explicit data flow
+- Predictable execution
+- Zero hidden coupling
+
+While laying the groundwork for:
+- Transactions
+- Write helpers
+- Optional query helpers
+- Future persistence backends
+
+---
+
 ## [1.0.5] – Custom Error Routing & Explicit Failure Control
 
 ### Added

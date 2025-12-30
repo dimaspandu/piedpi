@@ -32,7 +32,21 @@ if (is_file($envFile)) {
 */
 function env(string $key, mixed $default = null): mixed
 {
-  return $_ENV[$key] ?? $default;
+  $value = $_ENV[$key] ?? $default;
+
+  if (is_string($value)) {
+    $lower = strtolower($value);
+
+    if ($lower === 'true') {
+      return true;
+    }
+
+    if ($lower === 'false') {
+      return false;
+    }
+  }
+
+  return $value;
 }
 
 /*

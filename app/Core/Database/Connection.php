@@ -8,32 +8,34 @@ use PDO;
 use PDOException;
 
 /**
- * Class Connection
+ * PDO Connection Factory.
  *
- * Manages a single PDO connection instance.
+ * Provides a shared PDO instance configured
+ * from config/database.php.
  */
 final class Connection
 {
-  private static ?PDO $pdo = null;
+  private static ?PDO $instance = null;
 
   public static function get(): PDO
   {
-    if (self::$pdo !== null) {
-      return self::$pdo;
+    if (self::$instance !== null) {
+      return self::$instance;
     }
 
     $config = require dirname(__DIR__, 3) . '/config/database.php';
 
     $dsn = sprintf(
-      '%s:host=%s;dbname=%s;charset=%s',
+      '%s:host=%s;port=%s;dbname=%s;charset=%s',
       $config['driver'],
       $config['host'],
+      $config['port'],
       $config['database'],
       $config['charset']
     );
 
     try {
-      self::$pdo = new PDO(
+      self::$instance = new PDO(
         $dsn,
         $config['username'],
         $config['password'],
@@ -43,13 +45,13 @@ final class Connection
           PDO::ATTR_EMULATE_PREPARES   => false,
         ]
       );
+
+      return self::$instance;
     } catch (PDOException $e) {
-      throw new DatabaseException(
-        'Failed to connect to database',
-        $e
+      throw new PDOException(
+        'Database connection failed: ' . $e->getMessage(),
+        (int) $e->getCode()
       );
     }
-
-    return self::$pdo;
   }
 }

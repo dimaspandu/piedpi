@@ -18,7 +18,8 @@ It is designed to:
 * Scale gradually from MVP to a more serious system
 * Teach how common framework features actually work internally
 
-This repository is not a framework. It is a **reference architecture and learning-oriented codebase**.
+This repository is **not a framework**.
+It is a **reference architecture and learning-oriented codebase**.
 
 ---
 
@@ -42,10 +43,10 @@ The application is organized into clear layers:
 
 * **public/** – Entry point and web server boundary
 * **app/** – Application logic and core infrastructure
-* **config/** – Environment-agnostic configuration
+* **config/** – Environment-driven configuration
 * **views/** – Presentation layer
 * **storage/** – Runtime and writable data
-* **db/** – Database-related assets (future expansion)
+* **db/** – Database-related assets (schema, dumps, future tools)
 
 Each layer has a single responsibility and minimal coupling.
 
@@ -56,14 +57,16 @@ Each layer has a single responsibility and minimal coupling.
 A request flows through the system in the following order:
 
 1. Web server routes all requests to `public/index.php`
-2. `bootstrap.php` initializes the application
-3. Global exception handling is registered
-4. The Router matches the HTTP method and path
+2. `bootstrap.php` initializes environment and autoloading
+3. Environment variables are loaded from `.env`
+4. Router matches HTTP method and path
 5. The matched controller method is executed
-6. The controller uses Renderer and Widgets to produce output
-7. The response is streamed back to the client
+6. Controllers return explicit response objects
+7. Renderer streams output or JSON is sent
+8. Custom error routes are invoked if needed (404 / 500)
 
-There is no hidden middleware stack or container magic. The flow is explicit and debuggable.
+There is no hidden middleware stack or container magic.
+The flow is explicit, linear, and debuggable.
 
 ---
 
@@ -78,9 +81,10 @@ Features:
 * Static routes (`/`)
 * Dynamic parameters (`/users/:id`)
 * Method-based dispatching
-* Explicit 404 handling
+* Explicit route definitions
+* Router-level 404 and 500 handlers
 
-The Router does not throw exceptions for normal control flow. Not-found routes are rendered directly for performance and clarity.
+Error handling is treated as a **first-class routing concern**, not a side effect.
 
 ---
 
@@ -94,36 +98,61 @@ Key ideas:
 * Views are included explicitly
 * No template engine abstraction
 * Predictable rendering order
+* Optional static asset serving with gzip support
 
-This approach avoids buffering pitfalls and makes rendering behavior easy to reason about.
+This avoids buffering pitfalls and makes rendering behavior easy to reason about.
 
 ---
 
 ### Widget System
 
-Widgets are small, reusable UI helpers implemented as plain PHP functions.
+Widgets are small, reusable UI helpers implemented as plain PHP classes.
 
 They:
 
-* Generate simple HTML structures
+* Generate semantic HTML structures
+* Support nested and mixed content safely
 * Avoid stateful UI logic
 * Keep presentation logic close to markup
 
-This pattern scales well for MVPs and internal tools without introducing template engines too early.
+Widgets enable progressive HTML composition without introducing a template engine.
 
 ---
 
 ### Error Handling
 
-Error handling is centralized in `ErrorHandler`.
+Error handling is explicit and centralized at the Router level.
 
 Responsibilities:
 
-* Global exception handling
-* Environment-aware error output
-* Clean 404 rendering
+* Custom 404 (Not Found) routing
+* Custom 500 (Internal Server Error) routing
+* Exception-safe handler execution
+* Environment-aware diagnostics
 
-Runtime errors and HTTP errors are intentionally separated to avoid leaking internal details.
+Runtime failures and HTTP routing errors are intentionally separated to avoid leaking internal details.
+
+---
+
+### Database Layer
+
+Piedpi includes a **minimal and safe database foundation**, not an ORM.
+
+Components:
+
+* `config/database.php` — environment-based configuration
+* `Connection` — centralized PDO connection factory
+* `DB` — static, safe PDO facade
+* `DatabaseException` — boundary exception for all DB failures
+
+Design goals:
+
+* No hidden state
+* No query builder
+* No magic models
+* Explicit SQL ownership
+
+This layer provides a clean upgrade path without locking the architecture.
 
 ---
 
@@ -134,7 +163,7 @@ Configuration files live in `config/` and are plain PHP arrays.
 * `app.php` controls environment and debug behavior
 * `database.php` defines database connection settings
 
-Environment variables are loaded via `.env` files during bootstrap, keeping secrets out of version control.
+Environment variables are loaded via `.env` during bootstrap, keeping secrets out of version control and avoiding `getenv()` pitfalls.
 
 ---
 
@@ -143,6 +172,7 @@ Environment variables are loaded via `.env` files during bootstrap, keeping secr
 Requirements:
 
 * PHP 8.1 or higher
+* PDO extension for database usage
 
 Start the development server:
 
@@ -160,13 +190,13 @@ http://localhost:8888
 
 ## Testing
 
-Piedpi includes a **minimal, dependency-free testing setup** to keep the codebase lightweight and educational.
+Piedpi includes a **minimal, dependency-free testing setup**.
 
-The goal of testing here is not to replace PHPUnit, but to:
+Goals:
 
-* Demonstrate how unit testing works internally
-* Keep control flow explicit
-* Avoid magic bootstrapping or hidden globals
+* Demonstrate how testing works internally
+* Keep execution flow explicit
+* Avoid framework-level magic
 
 ### Test Structure
 
@@ -174,79 +204,34 @@ The goal of testing here is not to replace PHPUnit, but to:
 /tests
   ├── bootstrap.php
   ├── run.php
-  └── RouterTest.php
+  ├── RouterTest.php
+  ├── WidgetTest.php
+  └── DatabaseTest.php
 ```
 
-* `bootstrap.php`
-  Initializes the test environment and defines basic assertion helpers.
+* `bootstrap.php` initializes the test environment
+* `*Test.php` files group related tests
+* `run.php` discovers and executes tests
 
-* `*Test.php`
-  Each file contains one logical unit test group.
-
-* `run.php`
-  Discovers and executes all test files.
-
-### Assertion Helpers
-
-Assertions are implemented as simple functions, for example:
-
-* `assertTrue($condition, $message)`
-* `assertEquals($expected, $actual, $message)`
-
-They throw exceptions on failure, making test failures explicit and easy to debug.
-
-> Note: Assertion functions must only be declared **once** in `tests/bootstrap.php` to avoid redeclaration errors.
+Assertions are implemented as simple functions that throw exceptions on failure.
 
 ### Running Tests
-
-Run all tests using:
 
 ```bash
 php tests/run.php
 ```
 
-Example output:
-
-```
-WidgetTest passed
-RouterTest passed
-DatabaseTest passed
-
-✅ All tests passed
-```
-
-#### Skipping Tests
-
-Some tests (such as database-related tests) may require additional system dependencies.
-You can skip specific tests using the --skip flag:
+Skipping tests:
 
 ```bash
 php tests/run.php --skip=database
 ```
 
-Example output:
-
-```
-⏭  Skipped databasetest.php
-WidgetTest passed
-RouterTest passed
-
-✅ All tests passed
-```
-
-You can skip multiple tests by providing a comma-separated list:
-
-```bash
-php tests/run.php --skip=database,router
-```
-
 The test runner is intentionally minimal:
 
-* No external testing framework
-* No annotations or magic
+* No external framework
+* No annotations
 * Fully readable in a single file
-
-This design keeps the testing layer transparent, hackable, and easy to evolve as the project grows.
 
 ---
 
@@ -257,10 +242,10 @@ Piedpi is suitable for:
 * MVPs and prototypes
 * Internal dashboards
 * Learning PHP architecture
-* Interview or teaching material
-* Projects that may later migrate to a full framework
+* Teaching material or interviews
+* Systems that may later migrate to full frameworks
 
-It is not intended to replace Laravel, Symfony, or similar tools, but to complement understanding of them.
+It is not intended to replace Laravel or Symfony, but to **explain how they work internally**.
 
 ---
 
@@ -268,11 +253,11 @@ It is not intended to replace Laravel, Symfony, or similar tools, but to complem
 
 As a project grows, Piedpi can evolve by adding:
 
-* Safe PDO database layer
+* Extended database helpers
 * Service layer abstractions
-* Authentication middleware
-* Request and response objects
-* Caching and queueing
+* Authentication & authorization
+* Request / response objects
+* Caching and queues
 
 The existing structure supports these additions without major refactoring.
 
@@ -282,7 +267,7 @@ The existing structure supports these additions without major refactoring.
 
 Start small, but start clean.
 
-Piedpi is built on the belief that good architecture should not require complexity, only discipline.
+Piedpi is built on the belief that good architecture does not require complexity — only discipline.
 
 ---
 
