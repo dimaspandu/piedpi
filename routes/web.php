@@ -17,8 +17,11 @@ use App\Controllers\ErrorController;
 | These routes render streamed or full HTML views.
 */
 $router->get('/', [HomeController::class, 'index']);
-$router->get('/hello-cached', [HomeController::class, 'cached']);
+$router->get('/hello', [HomeController::class, 'hello']);
 $router->get('/about', [AboutController::class, 'index']);
+$router->get('/_debug/500', function () {
+  throw new Exception('Forced 500 error');
+});
 
 /*
 |-------------------------------------------------

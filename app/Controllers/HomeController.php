@@ -57,7 +57,7 @@ class HomeController
     Renderer::end();
   }
 
-  public function cached(): void
+  public function hello(): void
   {
     $key = 'home_page';
 
