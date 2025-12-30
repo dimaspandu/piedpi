@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.0.5] – Custom Error Routing & Explicit Failure Control
+
+### Added
+- Router-level custom 404 (Not Found) handler via `setNotFoundHandler()`
+- Router-level custom 500 (Internal Server Error) handler via `setErrorHandler()`
+- Ability to render error pages using standard controllers
+- Exception injection into 500 error handlers for diagnostic or logging needs
+
+### Improved
+- Explicit separation between:
+  - Route resolution
+  - Handler execution
+  - Error recovery paths
+- Router resilience against uncaught exceptions during handler execution
+- Developer control over error presentation without overriding global handlers
+- Consistency between normal routes and error flows
+
+### Notes
+This release formalizes **error handling as a first-class routing concern**.
+
+Instead of treating errors as side effects, Piedpi now models them as
+**explicit execution paths**, allowing custom error pages to be composed,
+streamed, or served just like normal routes.
+
+This design preserves:
+- Streaming compatibility
+- Framework-free architecture
+- Predictable control flow
+
+While significantly improving real-world production readiness.
+
+---
+
 ## [1.0.4] – Static Asset Serving & Gzip Support
 
 ### Added
