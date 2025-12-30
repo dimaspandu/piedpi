@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.0.4] – Static Asset Serving & Gzip Support
+
+### Added
+- Native gzip response support in `Renderer::serve()`
+- Content negotiation based on `Accept-Encoding`
+- Direct serving of full HTML, CSS, and JS files
+- Optional gzip toggle per response
+- Automatic `Content-Length` and `Vary: Accept-Encoding` headers
+
+### Improved
+- Separation between streamed views and static asset delivery
+- Support for modern frontend bundles without external servers
+- HTTP efficiency for single-file HTML applications
+- Compatibility with micro and monolithic deployments
+
+### Notes
+This release extends Piedpi beyond streaming views into a
+**hybrid rendering model**.
+
+The system now supports:
+- Progressive HTML streaming (BigPipe-style)
+- Full static document delivery
+- Optional gzip compression
+
+All without introducing a build step, dependency, or framework-level
+asset pipeline.
+
+---
+
 ## [1.0.3] – View Layer Refinement & Widget Enhancement
 
 ### Added
