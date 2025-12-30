@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Database\Database;
+use App\Core\Database\DB;
 use App\Core\Http\JsonResponse;
 
 /**
  * DbTestController
  *
- * Used to verify database connectivity and basic queries.
- * This controller intentionally uses the Database wrapper
- * instead of raw PDO.
+ * Used to verify database connectivity and queries.
+ * Uses the static DB facade instead of raw PDO.
  */
 final class DbTestController
 {
   /**
    * GET /_debug/db/items
    *
-   * Fetch items from database using the safe PDO wrapper.
+   * Fetch items from database using the safe DB wrapper.
    */
   public function items(): JsonResponse
   {
-    $db = new Database();
-
-    $items = $db->select(
+    $items = DB::query(
       'SELECT id, name, created_at FROM items'
     );
 

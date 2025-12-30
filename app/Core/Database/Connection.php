@@ -23,7 +23,7 @@ final class Connection
       return self::$instance;
     }
 
-    $config = require __DIR__ . '/../../../config/database.php';
+    $config = require dirname(__DIR__, 3) . '/config/database.php';
 
     $dsn = sprintf(
       '%s:host=%s;port=%s;dbname=%s;charset=%s',
