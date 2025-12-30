@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Http\JsonResponse;
 use App\Core\Renderer;
 use App\Core\View\TemplateCache;
 
@@ -20,24 +21,31 @@ class HomeController
 
     Renderer::chunk('<!DOCTYPE html>');
     Renderer::chunk('<html lang="en">');
+
+    Renderer::chunk(
+      widget('head', null, [
+        widget('title', null, 'Home')
+      ])
+    );
+
     Renderer::chunk('<body>');
 
     Renderer::chunk(
-      widget('h1', null, 'Streaming Content')
+      widget('h1', ['arrival-time' => date('d-m-y H:i:s')], 'Streaming Content (arrive at '.date('H:i:s').')')
     );
 
     // Simulate network / rendering delay
     usleep(500_000);
 
-    Renderer::chunk('<p>Step 2</p>');
+    Renderer::chunk('<p arrival-time='.date('d-m-y H:i:s').'>Step 2 (arrive at '.date('H:i:s').')</p>');
     
     // Simulate network / rendering delay
-    usleep(500_000);
+    usleep(550_000);
 
-    Renderer::chunk('<p>Step 3</p>');
+    Renderer::chunk('<p arrival-time='.date('d-m-y H:i:s').'>Step 3 (arrive at '.date('H:i:s').')</p>');
     
     // Simulate network / rendering delay
-    usleep(500_000);
+    usleep(600_000);
 
     Renderer::view(
       dirname(__DIR__) . '/Views/partial.php'
