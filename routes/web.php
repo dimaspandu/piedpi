@@ -16,9 +16,9 @@ $router->get('/hello', [HomeController::class, 'hello']);
 |--------------------------------------------------------------------------
 | Serve bundled frontend (gzip-enabled)
 |--------------------------------------------------------------------------
-| Example: /dist/app
+| Example: /product-landing or /application from directory /dist
 */
-$router->get('/dist/:name', [DistController::class, 'serve']);
+$router->get('/:name', [DistController::class, 'serve']);
 
 /*
 |-------------------------------------------------

@@ -18,13 +18,13 @@ class DistController
    * Serve a bundled HTML file from dist/.
    *
    * Example:
-   *   GET /dist/app  → dist/app.html
+   *   GET /application  → dist/application.html
    *
    * @param array<string, string> $params
    */
   public function serve(array $params): void
   {
-    $name = $params['name'] ?? 'app';
+    $name = $params['name'] ?? 'application';
 
     $path = dirname(__DIR__, 2) . '/dist/' . $name . '.html';
 
