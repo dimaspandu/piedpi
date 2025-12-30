@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace App\Core\Middleware;
 
-use App\Core\ErrorHandler;
 use Throwable;
 
 /**
- * Error boundary middleware.
+ * Class ErrorBoundary
  *
- * Acts as a safety wrapper around request execution,
- * preventing unhandled exceptions from crashing the process.
+ * Isolates execution errors without deciding
+ * how errors are rendered.
  */
 final class ErrorBoundary
 {
-  /**
-   * Execute the given callable inside a try/catch boundary.
-   *
-   * Any thrown exception is delegated to the central ErrorHandler.
-   */
-  public function handle(callable $next): void
+  public function handle(callable $callback): void
   {
     try {
-      $next();
+      $callback();
     } catch (Throwable $e) {
-      ErrorHandler::handle($e);
+      // Let Router decide how to handle errors
+      throw $e;
     }
   }
 }
