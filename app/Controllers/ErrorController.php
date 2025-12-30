@@ -4,23 +4,38 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Renderer;
+use App\Core\Http\JsonResponse;
 
+/**
+ * ErrorController
+ *
+ * Centralized JSON error responses for the API layer.
+ */
 class ErrorController
 {
-  public function notFound(): void
+  /**
+   * Handle 404 - Not Found errors.
+   */
+  public function notFound(): JsonResponse
   {
-    Renderer::start();
-    Renderer::chunk('<h1>404</h1>');
-    Renderer::chunk('<p>The page you requested was not found.</p>');
-    Renderer::end();
+    return (new JsonResponse([
+      'status'    => 404,
+      'message'   => 'The requested resource was not found.',
+      'timestamp' => time(),
+    ]))->status(404);
   }
 
-  public function serverError(array $params): void
+  /**
+   * Handle 500 - Internal Server Error.
+   *
+   * @param array $params Optional context or exception data
+   */
+  public function serverError(array $params = []): JsonResponse
   {
-    Renderer::start();
-    Renderer::chunk('<h1>500</h1>');
-    Renderer::chunk('<p>An unexpected error occurred.</p>');
-    Renderer::end();
+    return (new JsonResponse([
+      'status'    => 500,
+      'message'   => 'An unexpected server error occurred.',
+      'timestamp' => time(),
+    ]))->status(500);
   }
 }

@@ -6,8 +6,8 @@ declare(strict_types=1);
 |--------------------------------------------------------------------------
 | Global Exception Boundary (EARLY)
 |--------------------------------------------------------------------------
-| This ensures any uncaught exception is handled consistently
-| before the application is fully bootstrapped.
+| Ensures all uncaught exceptions are handled consistently
+| before the application is fully initialized.
 */
 set_exception_handler(function (Throwable $e): void {
   if (class_exists(\App\Core\ErrorHandler::class)) {
@@ -25,6 +25,7 @@ set_exception_handler(function (Throwable $e): void {
 |--------------------------------------------------------------------------
 | Bootstrap Application
 |--------------------------------------------------------------------------
+| Loads environment variables, configuration, and autoloaders.
 */
 require __DIR__ . '/bootstrap.php';
 
@@ -32,16 +33,17 @@ use App\Core\Router;
 
 /*
 |--------------------------------------------------------------------------
-| Register Routes
+| Register API Routes
 |--------------------------------------------------------------------------
 */
+
 $router = new Router();
 
-require __DIR__ . '/routes/web.php';
+require __DIR__ . '/routes/api.php';
 
 /*
 |--------------------------------------------------------------------------
-| Dispatch Request
+| Dispatch Incoming Request
 |--------------------------------------------------------------------------
 */
 $router->dispatch();

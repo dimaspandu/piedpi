@@ -147,13 +147,13 @@ Requirements:
 Start the development server:
 
 ```bash
-php -S localhost:7777
+php -S localhost:9999
 ```
 
 Then open:
 
 ```
-http://localhost:7777
+http://localhost:9999
 ```
 
 ---
