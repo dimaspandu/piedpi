@@ -25,16 +25,6 @@ $router->get('/_debug/500', function () {
 
 /*
 |-------------------------------------------------
-| Global error handlers
-|-------------------------------------------------
-| These handlers replace hardcoded error output.
-| They allow full HTML pages for 404 and 500.
-*/
-$router->setNotFoundHandler([ErrorController::class, 'notFound']);
-$router->setErrorHandler([ErrorController::class, 'serverError']);
-
-/*
-|-------------------------------------------------
 | Serve bundled frontend assets (gzip-enabled)
 |-------------------------------------------------
 | Intended for serving pre-built frontend output
@@ -47,3 +37,13 @@ $router->setErrorHandler([ErrorController::class, 'serverError']);
 | without relying on web server rewrite rules.
 */
 $router->get('/dist/:name', [DistController::class, 'serve']);
+
+/*
+|-------------------------------------------------
+| Global error handlers
+|-------------------------------------------------
+| These handlers replace hardcoded error output.
+| They allow full HTML pages for 404 and 500.
+*/
+$router->setNotFoundHandler([ErrorController::class, 'notFound']);
+$router->setErrorHandler([ErrorController::class, 'serverError']);
