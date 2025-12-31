@@ -30,6 +30,15 @@ set_exception_handler(function (Throwable $e): void {
 require __DIR__ . '/bootstrap.php';
 
 use App\Core\Router;
+use App\Core\Middleware\CorsMiddleware;
+
+/*
+|--------------------------------------------------------------------------
+| CORS Handling (EARLY HTTP CONCERN)
+|--------------------------------------------------------------------------
+| Must run before routing and controller execution.
+*/
+CorsMiddleware::handle();
 
 /*
 |--------------------------------------------------------------------------

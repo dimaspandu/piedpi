@@ -6,7 +6,7 @@ RewriteEngine On
 # ----------------------------------------------------------------------
 # Security: block internal directories
 # ----------------------------------------------------------------------
-RewriteRule ^(app|config|routes|storage|tests)/ - [F,L]
+RewriteRule ^(app|config|db|routes|storage|tests)/ - [F,L]
 
 # ----------------------------------------------------------------------
 # Block sensitive files
