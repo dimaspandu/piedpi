@@ -39,16 +39,100 @@ The code favors clarity over cleverness, and correctness over shortcuts.
 
 ## High-Level Architecture
 
-The application is organized into clear layers:
+The application follows a layered structure with clear separation of concerns:
 
-* **public/** – Entry point and web server boundary
-* **app/** – Application logic and core infrastructure
+* **public/** and **public_html/** – Web server entry points (see Deployment notes below)
+* **app/** – Core application logic, controllers, and presentation
 * **config/** – Environment-driven configuration
-* **views/** – Presentation layer
-* **storage/** – Runtime and writable data
-* **db/** – Database-related assets (schema, dumps, future tools)
+* **routes/** – Route definitions
+* **storage/** – Runtime data (cache, logs)
+* **db/** – Database schema and assets
 
-Each layer has a single responsibility and minimal coupling.
+Each component has a single responsibility and minimal coupling.
+
+---
+
+## Architecture Diagram
+
+![Piedpi Architecture Diagram](docs/architecture/piedpi-architecture.png)
+
+> **Source:** `docs/architecture/piedpi-architecture.puml` (generated with PlantUML)
+
+See the Request Lifecycle section for the detailed step-by-step flow.
+
+---
+
+## Middleware
+
+Piedpi uses an **explicit middleware approach** instead of an automatic pipeline. Middleware is applied manually where needed, keeping control flow visible and simple.
+
+### Usage Patterns
+
+**1. From routes (recommended for most cases)**
+
+```php
+$router->post('/api/items', function () {
+    \App\Core\Middleware\CsrfMiddleware::handle();
+    (new ItemController())->store();
+});
+```
+
+**2. From inside a controller method**
+
+```php
+public function store(): JsonResponse
+{
+    \App\Core\Middleware\CsrfMiddleware::handle();
+    // ... controller logic
+}
+```
+
+### Examples in this project
+
+- `AuthMiddleware` — protects web routes (e.g. `/admin/dashboard`)
+- `CsrfMiddleware` — protects state-changing API endpoints (`POST`, `PUT`, `DELETE` on `/api/items`)
+
+Both are located in `app/Core/Middleware/`.
+
+This design follows the project's core principle: **explicit is better than implicit**.
+
+---
+
+## Project Directory Structure
+
+```
+piedpi/
+├── app/
+│   ├── Controllers/     # Request handlers
+│   ├── Core/            # Router, Renderer, ErrorHandler, DB, etc.
+│   └── Views/           # Presentation templates
+├── config/              # app.php, database.php
+├── db/                  # SQL schema files
+├── dist/                # Static HTML assets (served via DistController)
+├── public/              # Local development entry point
+├── public_html/         # Shared hosting entry point
+├── routes/              # web.php, api.php
+├── storage/
+│   ├── cache/           # Compiled template cache
+│   └── logs/            # Application logs
+├── tests/               # Test suite and runner
+├── bootstrap.php        # Application bootstrap and autoloading
+├── Dockerfile
+├── .env.example
+└── README.md
+```
+
+---
+
+## Branches
+
+This repository maintains dedicated branches for focused development:
+
+* **main** – Stable full-stack application with integrated frontend and backend.
+* **frontend-services** – Frontend-focused services and UI components.
+* **backend-services** – Backend services, APIs, and server-side logic.
+
+Use `git checkout <branch>` to switch between branches as needed.
 
 ---
 
@@ -56,7 +140,7 @@ Each layer has a single responsibility and minimal coupling.
 
 A request flows through the system in the following order:
 
-1. Web server routes all requests to `public/index.php`
+1. Web server routes requests to `public/index.php` (local development and VPS) or `public_html/index.php` (shared hosting)
 2. `bootstrap.php` initializes environment and autoloading
 3. Environment variables are loaded from `.env`
 4. Router matches HTTP method and path
@@ -186,6 +270,7 @@ Then open:
 http://localhost:8888
 ```
 
+For local development always use the `public/` directory. When deploying to shared hosting platforms that require the document root to be named `public_html`, use the `public_html/` directory instead (the contents are identical).
 ---
 
 ## Testing

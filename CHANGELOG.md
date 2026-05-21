@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.0.7] – Documentation Overhaul & Middleware Usage Examples
+
+### Added
+- Comprehensive README.md overhaul with accurate architecture and structure
+- New **Middleware** section documenting explicit usage patterns (routes + controller)
+- New **Architecture Diagram** using high-quality PlantUML (replaces previous Mermaid)
+- New **Project Directory Structure** section with complete root-level layout
+- Documentation for dual web roots: `public/` (development/VPS) and `public_html/` (shared hosting)
+- Documentation for feature branches: `frontend-services` and `backend-services`
+- Example middleware: `AuthMiddleware` (authentication guard) and `CsrfMiddleware` (state-changing protection)
+- Practical middleware usage demonstrations in `routes/web.php` and `routes/api.php`
+- Alternative pattern showing middleware calls from inside controller methods (`ItemController`)
+
+### Changed
+- High-Level Architecture section corrected and expanded
+- Request Lifecycle updated to reflect both `public/` and `public_html/` entry points
+- Running the Project section enhanced with shared hosting deployment notes
+
+### Notes
+This release significantly improves project documentation and provides concrete, realistic examples of middleware usage while maintaining Piedpi’s core philosophy of **explicit control flow** and avoiding hidden magic or framework-style pipelines.
+
+---
+
 ## [1.0.6] – Database Configuration & PDO Abstraction Foundation
 
 ### Added

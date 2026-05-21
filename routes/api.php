@@ -9,6 +9,8 @@ use App\Controllers\ItemController;
 use App\Controllers\DbTestController;
 use App\Controllers\ErrorController;
 
+use App\Core\Middleware\CsrfMiddleware;
+
 /** @var Router $router */
 
 $router->post('/api/test', [HomeController::class, 'api']);
@@ -20,9 +22,28 @@ $router->get('/health', [HealthController::class, 'check']);
 |----------------------------------------------------------
 */
 $router->get('/api/items', [ItemController::class, 'index']);
-$router->post('/api/items', [ItemController::class, 'store']);
-$router->put('/api/items/:id', [ItemController::class, 'update']);
-$router->delete('/api/items/:id', [ItemController::class, 'destroy']);
+
+/*
+|-------------------------------------------------
+| Example: Middleware usage on mutating routes
+|-------------------------------------------------
+| CsrfMiddleware is called before the controller for POST/PUT/DELETE.
+| This demonstrates protecting state-changing endpoints.
+*/
+$router->post('/api/items', function () {
+    CsrfMiddleware::handle();
+    (new ItemController())->store();
+});
+
+$router->put('/api/items/:id', function (array $params) {
+    CsrfMiddleware::handle();
+    (new ItemController())->update($params);
+});
+
+$router->delete('/api/items/:id', function (array $params) {
+    CsrfMiddleware::handle();
+    (new ItemController())->destroy($params);
+});
 
 /*
 |--------------------------------------------------------------------------

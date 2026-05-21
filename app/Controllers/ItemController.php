@@ -8,6 +8,21 @@ use App\Core\Http\JsonResponse;
 
 final class ItemController
 {
+  /*
+   |-------------------------------------------------
+   | Alternative middleware pattern (from controller)
+   |-------------------------------------------------
+   | You can also call middleware at the start of the method
+   | instead of wrapping in the route file.
+   |
+   | Example:
+   |   public function store(): JsonResponse
+   |   {
+   |       \App\Core\Middleware\CsrfMiddleware::handle();
+   |       ...
+   |   }
+   */
+
   /**
    * GET /api/items?limit=10
    */

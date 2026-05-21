@@ -8,6 +8,8 @@ use App\Controllers\AboutController;
 use App\Controllers\DistController;
 use App\Controllers\ErrorController;
 
+use App\Core\Middleware\AuthMiddleware;
+
 /** @var Router $router */
 
 /*
@@ -48,6 +50,20 @@ if (
 | without relying on web server rewrite rules.
 */
 $router->get('/dist/:name', [DistController::class, 'serve']);
+
+/*
+|-------------------------------------------------
+| Example: Middleware usage (from routes)
+|-------------------------------------------------
+| Pattern: Call middleware before executing controller.
+| This keeps middleware usage explicit and visible in route definitions.
+*/
+$router->get('/admin/dashboard', function () {
+    AuthMiddleware::handle(); // requires Authorization: Bearer demo-secret-token
+
+    // If middleware passes, run the controller
+    (new \App\Controllers\AboutController())->index();
+});
 
 /*
 |-------------------------------------------------
