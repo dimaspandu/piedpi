@@ -1,273 +1,119 @@
-# Piedpi
+# Piedpi - Frontend Services
 
-## Why This Project Exists
+## Overview
 
-Piedpi was created as a lightweight, educational, and production-conscious PHP codebase that demonstrates how a modern web application can be built **without relying on large frameworks**, while still preserving good engineering principles.
+This is the **`frontend-services`** branch of Piedpi.
 
-Many MVPs and internal tools start small but fail to scale cleanly because they are either:
+Unlike the `main` branch (which is a full-stack application), this branch is a **lightweight frontend delivery service**. Its primary purpose is to serve pre-built frontend assets (HTML + JavaScript bundles) from the `dist/` directory with clean routing and gzip compression.
 
-* Over-engineered from day one using heavy frameworks
-* Under-engineered with no clear architecture or boundaries
+It is designed for scenarios where the frontend is built separately (e.g. using Vite, Webpack, or any modern frontend tooling) and you need a simple, framework-free way to host and deliver those builds.
 
-Piedpi sits intentionally in the middle.
+## Purpose of This Branch
 
-It is designed to:
+- Serve multiple pre-compiled frontend applications from a single PHP endpoint.
+- Provide efficient static asset delivery with built-in gzip support.
+- Act as a thin delivery layer between a frontend build pipeline and the browser.
+- Keep the backend minimal and predictable.
 
-* Be easy to understand from the first read
-* Encourage correct architectural habits
-* Scale gradually from MVP to a more serious system
-* Teach how common framework features actually work internally
+## Key Differences from `main`
 
-This repository is **not a framework**.
-It is a **reference architecture and learning-oriented codebase**.
+| Feature                    | `main` Branch                     | `frontend-services` Branch          |
+|---------------------------|-----------------------------------|-------------------------------------|
+| Focus                     | Full-stack application            | Frontend asset delivery             |
+| Database & API            | Yes                               | No                                  |
+| Number of Controllers     | Many                              | Minimal (`DistController`, `HomeController`, `ErrorController`) |
+| Middleware Examples       | Available (`AuthMiddleware`, `CsrfMiddleware`, etc.) | Not included (kept minimal)     |
+| Routing Style             | Feature-rich                      | Catch-all for frontend assets (`/:name`) |
+| Primary Use Case          | Internal tools, MVPs, learning    | Serving built frontend bundles      |
 
----
+## How It Works
 
-## Design Philosophy
+The routing strategy is deliberately simple:
 
-Piedpi follows a few core ideas:
+- `GET /` and `GET /hello` → handled by `HomeController`
+- All other requests (`/:name`) → routed to `DistController::serve`
 
-1. Explicit is better than implicit
-2. Simple control flow beats hidden magic
-3. Files and directories should explain themselves
-4. Production safety matters even for prototypes
-5. Core concepts should be readable without IDE assistance
+`DistController` looks for a file in the `dist/` folder using the route parameter (e.g. `/application` → `dist/application.html`) and serves it with gzip compression when supported by the client.
 
-The code favors clarity over cleverness, and correctness over shortcuts.
+This pattern allows you to host multiple frontend builds (landing pages, admin panels, SPAs, etc.) from one lightweight PHP application.
 
----
+## Architecture
 
-## High-Level Architecture
+The architecture on this branch is intentionally minimal:
 
-The application is organized into clear layers:
+- **Entry Point**: `public/index.php`
+- **Routing**: Simple router with one catch-all route for frontend assets
+- **Asset Serving**: `DistController` + `Renderer::serve()` with gzip support
+- **Error Handling**: Centralized 404 and 500 handlers via `ErrorController`
 
-* **public/** – Entry point and web server boundary
-* **app/** – Application logic and core infrastructure
-* **config/** – Environment-driven configuration
-* **views/** – Presentation layer
-* **storage/** – Runtime and writable data
-* **db/** – Database-related assets (schema, dumps, future tools)
+There is no database layer, no complex middleware pipeline, and no API routes. The focus is purely on reliable and efficient frontend delivery.
 
-Each layer has a single responsibility and minimal coupling.
+## Project Directory Structure (Relevant Parts)
 
----
-
-## Request Lifecycle
-
-A request flows through the system in the following order:
-
-1. Web server routes all requests to `public/index.php`
-2. `bootstrap.php` initializes environment and autoloading
-3. Environment variables are loaded from `.env`
-4. Router matches HTTP method and path
-5. The matched controller method is executed
-6. Controllers return explicit response objects
-7. Renderer streams output or JSON is sent
-8. Custom error routes are invoked if needed (404 / 500)
-
-There is no hidden middleware stack or container magic.
-The flow is explicit, linear, and debuggable.
-
----
-
-## Core Components
-
-### Router
-
-The Router uses a **Trie-based structure** to match routes efficiently.
-
-Features:
-
-* Static routes (`/`)
-* Dynamic parameters (`/users/:id`)
-* Method-based dispatching
-* Explicit route definitions
-* Router-level 404 and 500 handlers
-
-Error handling is treated as a **first-class routing concern**, not a side effect.
-
----
-
-### Renderer
-
-The Renderer is responsible for output streaming and view composition.
-
-Key ideas:
-
-* Output is streamed in chunks
-* Views are included explicitly
-* No template engine abstraction
-* Predictable rendering order
-* Optional static asset serving with gzip support
-
-This avoids buffering pitfalls and makes rendering behavior easy to reason about.
-
----
-
-### Widget System
-
-Widgets are small, reusable UI helpers implemented as plain PHP classes.
-
-They:
-
-* Generate semantic HTML structures
-* Support nested and mixed content safely
-* Avoid stateful UI logic
-* Keep presentation logic close to markup
-
-Widgets enable progressive HTML composition without introducing a template engine.
-
----
-
-### Error Handling
-
-Error handling is explicit and centralized at the Router level.
-
-Responsibilities:
-
-* Custom 404 (Not Found) routing
-* Custom 500 (Internal Server Error) routing
-* Exception-safe handler execution
-* Environment-aware diagnostics
-
-Runtime failures and HTTP routing errors are intentionally separated to avoid leaking internal details.
-
----
-
-### Database Layer
-
-Piedpi includes a **minimal and safe database foundation**, not an ORM.
-
-Components:
-
-* `config/database.php` — environment-based configuration
-* `Connection` — centralized PDO connection factory
-* `DB` — static, safe PDO facade
-* `DatabaseException` — boundary exception for all DB failures
-
-Design goals:
-
-* No hidden state
-* No query builder
-* No magic models
-* Explicit SQL ownership
-
-This layer provides a clean upgrade path without locking the architecture.
-
----
-
-## Configuration
-
-Configuration files live in `config/` and are plain PHP arrays.
-
-* `app.php` controls environment and debug behavior
-* `database.php` defines database connection settings
-
-Environment variables are loaded via `.env` during bootstrap, keeping secrets out of version control and avoiding `getenv()` pitfalls.
-
----
+```
+frontend-services/
+├── app/
+│   ├── Controllers/
+│   │   ├── DistController.php     # Serves files from dist/
+│   │   ├── HomeController.php
+│   │   └── ErrorController.php
+│   └── Core/                      # Router, Renderer, ErrorHandler, etc.
+├── config/
+├── dist/                          # Pre-built frontend files (*.html)
+│   ├── application.html
+│   └── product-landing.html
+├── public/
+├── routes/
+│   └── web.php                    # Minimal routing (mostly catch-all)
+├── storage/
+└── README.md
+```
 
 ## Running the Project
 
 Requirements:
-
-* PHP 8.1 or higher
-* PDO extension for database usage
+- PHP 8.1 or higher
 
 Start the development server:
 
 ```bash
-php -S localhost:7777
+php -S localhost:8888 -t public
 ```
 
 Then open:
 
 ```
-http://localhost:7777
+http://localhost:8888
 ```
 
----
-
-## Testing
-
-Piedpi includes a **minimal, dependency-free testing setup**.
-
-Goals:
-
-* Demonstrate how testing works internally
-* Keep execution flow explicit
-* Avoid framework-level magic
-
-### Test Structure
-
-```
-/tests
-  ├── bootstrap.php
-  ├── run.php
-  ├── RouterTest.php
-  ├── WidgetTest.php
-  └── DatabaseTest.php
-```
-
-* `bootstrap.php` initializes the test environment
-* `*Test.php` files group related tests
-* `run.php` discovers and executes tests
-
-Assertions are implemented as simple functions that throw exceptions on failure.
-
-### Running Tests
-
-```bash
-php tests/run.php
-```
-
-Skipping tests:
-
-```bash
-php tests/run.php --skip=database
-```
-
-The test runner is intentionally minimal:
-
-* No external framework
-* No annotations
-* Fully readable in a single file
-
----
+Example routes:
+- `/` → Home page
+- `/application` → Serves `dist/application.html`
+- `/product-landing` → Serves `dist/product-landing.html`
 
 ## Intended Use Cases
 
-Piedpi is suitable for:
+This branch is ideal for:
 
-* MVPs and prototypes
-* Internal dashboards
-* Learning PHP architecture
-* Teaching material or interviews
-* Systems that may later migrate to full frameworks
+- Serving frontend builds generated from a separate repository or build pipeline
+- Hosting multiple single-page or multi-page applications
+- Lightweight frontend delivery without needing Nginx/Apache static file configuration
+- Prototyping or internal tools where the frontend is built independently
 
-It is not intended to replace Laravel or Symfony, but to **explain how they work internally**.
+## Relationship with Other Branches
 
----
+- `main` → Full-stack reference implementation
+- `frontend-services` → **This branch** – focused on frontend asset serving
+- `backend-services` → Backend-focused services (if exists)
 
-## Scalability Path
+## Philosophy
 
-As a project grows, Piedpi can evolve by adding:
+Even though this branch is simpler, it still follows Piedpi’s core principles:
 
-* Extended database helpers
-* Service layer abstractions
-* Authentication & authorization
-* Request / response objects
-* Caching and queues
-
-The existing structure supports these additions without major refactoring.
-
----
-
-## Philosophy on Growth
-
-Start small, but start clean.
-
-Piedpi is built on the belief that good architecture does not require complexity — only discipline.
+- Explicit is better than implicit
+- Simple control flow
+- No hidden magic
+- Production-conscious design (gzip, clean error handling, predictable routing)
 
 ---
 
