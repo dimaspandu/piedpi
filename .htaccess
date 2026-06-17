@@ -16,6 +16,13 @@ RewriteRule ^(app|config|db|routes|storage|tests)/ - [F,L]
 </FilesMatch>
 
 # ----------------------------------------------------------------------
+# Redirect trailing slashes (except root) to non-trailing slash
+# ----------------------------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^(.+)/$
+RewriteRule ^ %1 [L,R=301]
+
+# ----------------------------------------------------------------------
 # Front Controller
 # ----------------------------------------------------------------------
 RewriteCond %{REQUEST_FILENAME} -f [OR]
