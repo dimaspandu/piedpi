@@ -72,7 +72,7 @@ Piedpi uses an **explicit middleware approach** instead of an automatic pipeline
 
 ```php
 $router->post('/api/items', function () {
-    \App\Core\Middleware\CsrfMiddleware::handle();
+    \App\Middleware\CsrfMiddleware::handle();
     (new ItemController())->store();
 });
 ```
@@ -82,7 +82,7 @@ $router->post('/api/items', function () {
 ```php
 public function store(): JsonResponse
 {
-    \App\Core\Middleware\CsrfMiddleware::handle();
+    \App\Middleware\CsrfMiddleware::handle();
     // ... controller logic
 }
 ```
@@ -91,8 +91,9 @@ public function store(): JsonResponse
 
 - `AuthMiddleware` — protects web routes (e.g. `/admin/dashboard`)
 - `CsrfMiddleware` — protects state-changing API endpoints (`POST`, `PUT`, `DELETE` on `/api/items`)
+- `CorsMiddleware` — handles CORS headers at entry point
 
-Both are located in `app/Core/Middleware/`.
+All are located in `app/Middleware/`.
 
 This design follows the project's core principle: **explicit is better than implicit**.
 
@@ -105,6 +106,7 @@ piedpi/
 ├── app/
 │   ├── Controllers/     # Request handlers
 │   ├── Core/            # Router, Renderer, ErrorHandler, DB, etc.
+│   ├── Middleware/      # Auth, Csrf, Cors
 │   └── Views/           # Presentation templates
 ├── config/              # app.php, database.php
 ├── db/                  # SQL schema files
@@ -142,7 +144,7 @@ A request flows through the system in the following order:
 
 1. Web server routes requests to `public/index.php` (local development and VPS) or `public_html/index.php` (shared hosting)
 2. `bootstrap.php` initializes environment and autoloading
-3. Environment variables are loaded from `.env`
+3. `CorsMiddleware` handles CORS headers (entry point)
 4. Router matches HTTP method and path
 5. The matched controller method is executed
 6. Controllers return explicit response objects

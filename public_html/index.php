@@ -30,7 +30,7 @@ set_exception_handler(function (Throwable $e): void {
 require dirname(__DIR__) . '/bootstrap.php';
 
 use App\Core\Router;
-use App\Core\Middleware\CorsMiddleware;
+use App\Middleware\CorsMiddleware;
 
 /*
 |--------------------------------------------------------------------------

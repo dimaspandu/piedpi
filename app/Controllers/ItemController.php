@@ -18,7 +18,7 @@ final class ItemController
    | Example:
    |   public function store(): JsonResponse
    |   {
-   |       \App\Core\Middleware\CsrfMiddleware::handle();
+|   \App\Middleware\CsrfMiddleware::handle();
    |       ...
    |   }
    */

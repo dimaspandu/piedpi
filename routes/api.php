@@ -9,7 +9,7 @@ use App\Controllers\ItemController;
 use App\Controllers\DbTestController;
 use App\Controllers\ErrorController;
 
-use App\Core\Middleware\CsrfMiddleware;
+use App\Middleware\CsrfMiddleware;
 
 /** @var Router $router */
 

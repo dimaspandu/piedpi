@@ -1,6 +1,17 @@
 # Changelog
 
-## [1.0.7] – Documentation Overhaul & Middleware Usage Examples
+## [1.0.8] – Middleware Restructure
+
+### Changed
+- Moved `AuthMiddleware`, `CsrfMiddleware`, and `CorsMiddleware` from `app/Core/Middleware/` to `app/Middleware/`
+- Middleware now resides at the application level alongside Controllers and Views for better architectural clarity
+- `ErrorBoundary` remains in `app/Core/Middleware/` as it is framework-level infrastructure
+- Updated all namespace imports across routes and entry points
+
+### Notes
+This restructure separates application concerns (Auth, CSRF, CORS) from core framework infrastructure. Application-level middleware now lives in `app/Middleware/` while core execution middleware stays in `app/Core/Middleware/`.
+
+---
 
 ### Added
 - Comprehensive README.md overhaul with accurate architecture and structure

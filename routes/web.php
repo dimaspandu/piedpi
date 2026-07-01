@@ -8,7 +8,7 @@ use App\Controllers\AboutController;
 use App\Controllers\DistController;
 use App\Controllers\ErrorController;
 
-use App\Core\Middleware\AuthMiddleware;
+use App\Middleware\AuthMiddleware;
 
 /** @var Router $router */
 
