@@ -46,12 +46,12 @@ CORS middleware is included to support cross-origin requests from frontend clien
 
 The architecture is intentionally backend-focused:
 
-- **Entry Point**: `public/index.php` (or `public_html/index.php` for shared hosting)
+- **Entry Point**: `index.php` (root level)
 - **Routing**: API-only routes defined in `routes/api.php`
 - **Controllers**: Handle business logic for health, items, and database testing
 - **Database Layer**: Environment-driven configuration with safe PDO access
 - **Error Handling**: Explicit 404 and 500 handlers returning consistent responses (JSON-friendly)
-- **Middleware**: Lightweight (currently only CORS for API compatibility)
+- **Middleware**: Lightweight (`CorsMiddleware` in `app/Middleware/`)
 
 There is no view rendering or frontend asset serving. The output is primarily JSON or simple responses suitable for API consumption.
 
@@ -65,11 +65,12 @@ backend-services/
 │   │   ├── ItemController.php
 │   │   ├── DbTestController.php
 │   │   └── ErrorController.php
-│   └── Core/
-│       ├── Database/          # Connection, DB facade, exceptions
-│       ├── Router.php
-│       ├── ErrorHandler.php
-│       └── Middleware/        # CORS and ErrorBoundary
+│   ├── Core/
+│   │   ├── Database/          # Connection, DB facade, exceptions
+│   │   ├── Router.php
+│   │   ├── ErrorHandler.php
+│   │   └── Middleware/        # ErrorBoundary only
+│   └── Middleware/            # CorsMiddleware (application-level)
 ├── config/
 │   ├── app.php
 │   └── database.php
@@ -77,7 +78,7 @@ backend-services/
 │   └── piedpi.sql             # Database schema
 ├── routes/
 │   └── api.php                # All API endpoints
-├── public/                    # (or public_html/)
+├── index.php                  # Entry point (root level)
 ├── storage/
 └── README.md
 ```
@@ -92,7 +93,7 @@ Requirements:
 Start the development server:
 
 ```bash
-php -S localhost:8888 -t public
+php -S localhost:8888
 ```
 
 Example API calls:
