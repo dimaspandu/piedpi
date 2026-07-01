@@ -41,7 +41,7 @@ This pattern allows you to host multiple frontend builds (landing pages, admin p
 
 The architecture on this branch is intentionally minimal:
 
-- **Entry Point**: `public/index.php`
+- **Entry Point**: `index.php` (root level)
 - **Routing**: Simple router with one catch-all route for frontend assets
 - **Asset Serving**: `DistController` + `Renderer::serve()` with gzip support
 - **Error Handling**: Centralized 404 and 500 handlers via `ErrorController`
@@ -62,7 +62,7 @@ frontend-services/
 ├── dist/                          # Pre-built frontend files (*.html)
 │   ├── application.html
 │   └── product-landing.html
-├── public/
+├── index.php                      # Entry point (root level)
 ├── routes/
 │   └── web.php                    # Minimal routing (mostly catch-all)
 ├── storage/
@@ -77,7 +77,7 @@ Requirements:
 Start the development server:
 
 ```bash
-php -S localhost:8888 -t public
+php -S localhost:8888 -t .
 ```
 
 Then open:
