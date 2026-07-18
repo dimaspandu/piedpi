@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Core\View\TemplateCache;
+
 /**
  * Class Renderer
  *
@@ -54,6 +56,71 @@ class Renderer
 
     // flush after view execution
     self::flush();
+  }
+
+  /**
+   * Render a compiled template view with expression interpolation.
+   *
+   * Supports Blade-like syntax:
+   *   {{ $var }}  -> escaped output
+   *   {{ var }}   -> escaped output (auto-prefix $)
+   *   {!! $html }> -> unescaped output
+   *
+   * @param string $path
+   * @param array<string, mixed> $data
+   */
+  public static function template(string $path, array $data = []): void
+  {
+    if (!is_file($path)) {
+      throw new \RuntimeException("Template file not found: {$path}");
+    }
+
+    $compiledPath = self::compileTemplate($path);
+
+    extract($data, EXTR_SKIP);
+    require $compiledPath;
+
+    self::flush();
+  }
+
+  /**
+   * Compile a template file into plain PHP and return the compiled path.
+   *
+   * @return string
+   */
+  private static function compileTemplate(string $path): string
+  {
+    $key = 'template_' . md5((string) filemtime($path) . file_get_contents($path));
+
+    if ($compiled = TemplateCache::get($key)) {
+      return $compiled;
+    }
+
+    $content = file_get_contents($path);
+
+    $compiled = preg_replace_callback(
+      '/{{(.+?)}}/',
+      function ($matches) {
+        $expr = trim($matches[1]);
+        if (!str_starts_with($expr, '$') && preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $expr)) {
+          $expr = '$' . $expr;
+        }
+        return '<?= htmlspecialchars(' . $expr . ') ?>';
+      },
+      $content
+    );
+
+    $compiled = preg_replace(
+      '/{!!(.+?)!!}/',
+      '<?= $1 ?>',
+      $compiled
+    );
+
+    $compiledPath = sys_get_temp_dir() . '/piedpi_template_' . md5($path) . '.php';
+    file_put_contents($compiledPath, $compiled);
+    TemplateCache::put($key, $compiledPath);
+
+    return $compiledPath;
   }
 
   /**

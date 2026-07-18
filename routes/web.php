@@ -9,6 +9,7 @@ use App\Controllers\DistController;
 use App\Controllers\ErrorController;
 
 use App\Middleware\AuthMiddleware;
+use App\Controllers\TemplateController;
 
 /** @var Router $router */
 
@@ -21,6 +22,8 @@ use App\Middleware\AuthMiddleware;
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/hello', [HomeController::class, 'hello']);
 $router->get('/about', [AboutController::class, 'index']);
+$router->get('/template', [TemplateController::class, 'index']);
+$router->get('/template/items', [TemplateController::class, 'items']);
 
 /*
 |--------------------------------------------------------------------------

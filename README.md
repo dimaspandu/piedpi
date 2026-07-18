@@ -176,17 +176,83 @@ Error handling is treated as a **first-class routing concern**, not a side effec
 
 ### Renderer
 
-The Renderer is responsible for output streaming and view composition.
+The Renderer is responsible for output streaming, view composition, and lightweight template compilation.
 
 Key ideas:
 
 * Output is streamed in chunks
-* Views are included explicitly
-* No template engine abstraction
+* Views are included explicitly via `Renderer::view()`
+* Templates are compiled before rendering via `Renderer::template()`
 * Predictable rendering order
 * Optional static asset serving with gzip support
 
 This avoids buffering pitfalls and makes rendering behavior easy to reason about.
+
+#### View Mode (`Renderer::view()`)
+
+Direct PHP view rendering with variable extraction:
+
+```php
+Renderer::view(dirname(__DIR__) . '/Views/about.php', [
+    'title' => 'About Piedpi',
+    'version' => '1.0.0',
+]);
+```
+
+In the view file, variables are accessed as plain PHP:
+
+```php
+<title><?= htmlspecialchars($title) ?></title>
+```
+
+#### Template Mode (`Renderer::template()`)
+
+Blade-like template syntax with automatic escaping and compilation:
+
+```php
+Renderer::template(dirname(__DIR__) . '/Views/template_demo.php', [
+    'title' => 'Piedpi Template Demo',
+    'version' => '1.0.0',
+]);
+```
+
+In the template file, use expression interpolation:
+
+```php
+<title>{{ title }}</title>
+<h1>{{ title }}</h1>
+<p>Version: {{ $version }}</p>
+<p>Unescaped: {!! $html !!}</p>
+```
+
+Supported syntax:
+
+| Syntax | Behavior |
+|--------|----------|
+| `{{ title }}` | Escaped output (auto-prefix `$`) |
+| `{{ $title }}` | Escaped output (explicit variable) |
+| `{!! $html }>}` | Unescaped output |
+
+#### Streaming With Templates
+
+Templates can be rendered inside loops for progressive HTML generation:
+
+```php
+Renderer::start();
+Renderer::chunk('<ul>');
+
+foreach ($items as $item) {
+    Renderer::template(dirname(__DIR__) . '/Views/template_item.php', [
+        'name' => $item['name'],
+        'price' => $item['price'],
+    ]);
+}
+
+Renderer::chunk('</ul>');
+Renderer::end();
+```
+
+This enables BigPipe-style progressive rendering without framework-level abstractions.
 
 ---
 
