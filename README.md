@@ -56,8 +56,12 @@ frontend-services/
 │   ├── Controllers/
 │   │   ├── DistController.php     # Serves files from dist/
 │   │   ├── HomeController.php
+│   │   ├── TemplateController.php # Template rendering examples
 │   │   └── ErrorController.php
 │   └── Core/                      # Router, Renderer, ErrorHandler, etc.
+├── app/Views/
+│   ├── template_demo.php
+│   └── template_item.php
 ├── config/
 ├── dist/                          # Pre-built frontend files (*.html)
 │   ├── application.html
@@ -66,8 +70,44 @@ frontend-services/
 ├── routes/
 │   └── web.php                    # Minimal routing (mostly catch-all)
 ├── storage/
+│   └── cache/                     # Compiled template cache
 └── README.md
 ```
+
+## Template Engine
+
+The Renderer supports two modes for serving HTML:
+
+### View Mode (`Renderer::view()`)
+
+Direct PHP view rendering:
+
+```php
+Renderer::view(dirname(__DIR__) . '/Views/partial.php', [
+    'title' => 'Hello',
+]);
+```
+
+### Template Mode (`Renderer::template()`)
+
+Blade-like template syntax with automatic escaping and compilation:
+
+```php
+Renderer::template(dirname(__DIR__) . '/Views/template_demo.php', [
+    'title' => 'Piedpi Frontend Services',
+    'version' => '1.1.0',
+]);
+```
+
+Template syntax:
+
+| Syntax | Behavior |
+|--------|----------|
+| `{{ title }}` | Escaped output (auto-prefix `$`) |
+| `{{ $version }}` | Escaped output (explicit variable) |
+| `{!! $html }>}` | Unescaped output |
+
+Templates are compiled to plain PHP and cached automatically. Source file changes invalidate the cache.
 
 ## Running the Project
 

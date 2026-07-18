@@ -6,11 +6,14 @@ use App\Core\Router;
 use App\Controllers\HomeController;
 use App\Controllers\DistController;
 use App\Controllers\ErrorController;
+use App\Controllers\TemplateController;
 
 /** @var Router $router */
 
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/hello', [HomeController::class, 'hello']);
+$router->get('/template', [TemplateController::class, 'index']);
+$router->get('/template/items', [TemplateController::class, 'items']);
 
 /*
 |--------------------------------------------------------------------------
