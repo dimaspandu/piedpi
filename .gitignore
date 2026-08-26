@@ -6,3 +6,6 @@
 
 # View / template cache
 /storage/cache/*
+
+# Compiled templates
+/storage/compiled/*

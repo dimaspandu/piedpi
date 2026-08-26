@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.1.1] – Template Cache Resilience
+
+### Fixed
+- Stale compiled template paths in `TemplateCache` no longer cause 500 errors after OS temp cleanup
+- `Renderer::compileTemplate()` now validates cached file existence before requiring it
+- Compiled templates moved from `sys_get_temp_dir()` (system `/tmp`) to project-local `storage/compiled/`
+- Eliminated dependency on OS temp directory lifecycle, which caused periodic production failures on shared hosting
+
+### Changed
+- `storage/compiled/` is now the canonical location for compiled template files
+- `TemplateCache` entries that point to missing files are automatically invalidated and recompiled on next request
+
+### Notes
+On shared hosting environments (e.g., Hostinger), system temp directories are periodically purged (typically every 24–48 hours). The previous implementation stored compiled PHP templates in `sys_get_temp_dir()` while keeping only the file paths in `storage/cache/`. When the OS deleted the compiled files but the cache remained populated, subsequent requests attempted to `require()` non-existent files, causing fatal errors and HTTP 500 responses. Clearing `storage/cache/` temporarily resolved the issue until the next OS cleanup cycle.
+
+This fix ensures template compilation survives OS temp directory purges by storing compiled output inside the project directory, and adds a safety check to recompile missing files automatically.
+
+---
+
 ## [1.1.0] – Template Engine & Streaming Composition
 
 ### Added
