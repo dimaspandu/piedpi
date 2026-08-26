@@ -93,7 +93,9 @@ class Renderer
     $key = 'template_' . md5((string) filemtime($path) . file_get_contents($path));
 
     if ($compiled = TemplateCache::get($key)) {
-      return $compiled;
+      if (is_file($compiled)) {
+        return $compiled;
+      }
     }
 
     $content = file_get_contents($path);
@@ -116,7 +118,8 @@ class Renderer
       $compiled
     );
 
-    $compiledPath = sys_get_temp_dir() . '/piedpi_template_' . md5($path) . '.php';
+    $compiledDir = __DIR__ . '/../../../storage/compiled';
+    $compiledPath = $compiledDir . '/piedpi_template_' . md5($path) . '.php';
     file_put_contents($compiledPath, $compiled);
     TemplateCache::put($key, $compiledPath);
 
