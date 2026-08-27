@@ -118,8 +118,13 @@ class Renderer
       $compiled
     );
 
-    $compiledDir = __DIR__ . '/../../../storage/compiled';
+    $compiledDir = __DIR__ . '/../../storage/compiled';
     $compiledPath = $compiledDir . '/piedpi_template_' . md5($path) . '.php';
+
+    if (!is_dir($compiledDir)) {
+      mkdir($compiledDir, 0777, true);
+    }
+
     file_put_contents($compiledPath, $compiled);
     TemplateCache::put($key, $compiledPath);
 
