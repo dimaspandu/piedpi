@@ -70,7 +70,8 @@ frontend-services/
 ├── routes/
 │   └── web.php                    # Minimal routing (mostly catch-all)
 ├── storage/
-│   └── cache/                     # Compiled template cache
+│   ├── cache/                     # Template cache metadata
+│   └── compiled/                  # Compiled template PHP files
 └── README.md
 ```
 
