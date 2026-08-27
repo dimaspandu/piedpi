@@ -115,7 +115,8 @@ piedpi/
 ├── public_html/         # Shared hosting entry point
 ├── routes/              # web.php, api.php
 ├── storage/
-│   ├── cache/           # Compiled template cache
+│   ├── cache/           # Template cache metadata
+│   ├── compiled/        # Compiled template PHP files
 │   └── logs/            # Application logs
 ├── tests/               # Test suite and runner
 ├── bootstrap.php        # Application bootstrap and autoloading
