@@ -15,6 +15,14 @@ final class VarNode implements NodeInterface
   public function render(array $data, mixed $currentItem = null): string
   {
     $value = TemplateEngine::lookup($data, $this->key, $currentItem);
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(self::valueToString($value), ENT_QUOTES, 'UTF-8');
+  }
+
+  private static function valueToString(mixed $value): string
+  {
+    if (is_array($value) || is_object($value)) {
+      return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+    return (string) $value;
   }
 }

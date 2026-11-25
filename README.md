@@ -234,6 +234,57 @@ Supported syntax:
 | `{{ $title }}` | Escaped output (explicit variable) |
 | `{!! $html }>}` | Unescaped output |
 
+#### Go Template Mode (`Renderer::goTemplate()`)
+
+Go-like template syntax with control structures (conditionals, loops, field access):
+
+```php
+Renderer::goTemplate(dirname(__DIR__) . '/Views/template_go_demo.php', [
+    'title' => 'Products',
+    'items' => [
+        ['name' => 'Apple', 'price' => 1.50, 'in_stock' => true],
+        ['name' => 'Banana', 'price' => 0.75, 'in_stock' => false],
+    ],
+    'show_debug' => true,
+]);
+```
+
+In the template file, use Go template syntax:
+
+```html
+<h1>{{ .title }}</h1>
+{{ if .items }}
+<ul>
+{{ range .items }}
+  <li>{{ .name }} - ${{ .price }}
+    {{ if .in_stock }}<span class="badge">In Stock</span>
+    {{ else }}<span class="badge">Out of Stock</span>{{ end }}
+  </li>
+{{ end }}
+</ul>
+{{ else }}
+<p>No items</p>
+{{ end }}
+
+{{ if .show_debug }}
+<pre>{{ . }}</pre>
+{{ end }}
+```
+
+Supported syntax:
+
+| Syntax | Behavior |
+|--------|----------|
+| `{{ key }}` | Escaped variable (backward compatible) |
+| `{{ .key }}` | Go-style field access → `$data['key']` |
+| `{{ . }}` | Render entire current context |
+| `{{ if key }}...{{ end }}` | Conditional |
+| `{{ if key }}...{{ else }}...{{ end }}` | Conditional with else |
+| `{{ range key }}...{{ end }}` | Iterate array, `{{ . }}` = current item |
+| Nesting | `if` in `range`, `range` in `range`, `if` in `if` |
+
+All variables missing render as empty string. HTML is auto-escaped.
+
 #### Streaming With Templates
 
 Templates can be rendered inside loops for progressive HTML generation:
