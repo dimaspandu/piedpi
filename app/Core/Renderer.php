@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Core\View\TemplateCache;
+use App\Core\View\TemplateEngine;
 
 /**
  * Class Renderer
@@ -80,6 +81,33 @@ class Renderer
     extract($data, EXTR_SKIP);
     require $compiledPath;
 
+    self::flush();
+  }
+
+  /**
+   * Render a Go-like template with control structures.
+   *
+   * Supports Go template syntax:
+   *   {{ key }}       -> escaped variable (backward compatible)
+   *   {{ .key }}      -> Go-style field access (data['key'])
+   *   {{ . }}         -> render entire current context
+   *   {{ if key }}...{{ end }}       -> conditional
+   *   {{ if key }}...{{ else }}...{{ end }} -> conditional with else
+   *   {{ range key }}...{{ end }}    -> iterate array
+   *
+   * @param string $path
+   * @param array<string, mixed> $data
+   */
+  public static function goTemplate(string $path, array $data = []): void
+  {
+    if (!is_file($path)) {
+      throw new \RuntimeException("Template file not found: {$path}");
+    }
+
+    $content = file_get_contents($path);
+    $rendered = TemplateEngine::render($content, $data);
+
+    echo $rendered;
     self::flush();
   }
 
