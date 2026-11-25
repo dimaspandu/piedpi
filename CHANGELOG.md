@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.1.2] – Go-like Template Engine
+
+### Added
+- `TemplateEngine` class with `tokenize()`, `parse()`, `render()`, `lookup()` methods
+- AST node classes: `RootNode`, `TextNode`, `VarNode`, `IfNode`, `RangeNode`
+- `Renderer::goTemplate()` method for Go-style template rendering
+- Go template syntax support:
+  - Variable substitution: `{{ key }}`, `{{ .key }}` (Go-style field access)
+  - Context rendering: `{{ . }}` (full context or current range item)
+  - Conditionals: `{{ if key }}...{{ end }}`, `{{ if key }}...{{ else }}...{{ end }}`
+  - Loops: `{{ range key }}...{{ end }}` with `{{ . }}` as current item
+  - Nesting: `if` in `range`, `range` in `range`, `if` in `if`
+- `template_go_demo.php` example view demonstrating all features
+- `/template/go` route for live demo
+- Unit tests (`TemplateEngineTest.php`) covering all features
+
+### Changed
+- Missing keys render as empty string (no errors)
+- HTML auto-escaped via `htmlspecialchars` in `VarNode`
+- Primitive data in `{{ range }}` context handled safely (returns empty)
+
+### Notes
+This release adds a second template engine with Go-like syntax alongside the existing Blade-like `Renderer::template()`. Both engines coexist:
+
+- `Renderer::template()` — Blade-like syntax (`{{ var }}`, `{!! $html !!}`)
+- `Renderer::goTemplate()` — Go-like syntax (`{{ .key }}`, `{{ if }}`, `{{ range }}`)
+
+The Go template engine uses a tokenize → parse → render pipeline with AST nodes, similar to how Go's `text/template` works internally.
+
+---
+
 ## [1.1.1] – Template Cache Resilience
 
 ### Fixed

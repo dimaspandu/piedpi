@@ -89,14 +89,19 @@ Renderer::view(dirname(__DIR__) . '/Views/partial.php', [
 ]);
 ```
 
-### Template Mode (`Renderer::template()`)
+### Go Template Mode (`Renderer::goTemplate()`)
 
-Blade-like template syntax with automatic escaping and compilation:
+Go-like template syntax with control structures (conditionals, loops, field access):
 
 ```php
-Renderer::template(dirname(__DIR__) . '/Views/template_demo.php', [
-    'title' => 'Piedpi Frontend Services',
-    'version' => '1.1.0',
+Renderer::goTemplate(dirname(__DIR__) . '/Views/template_go_demo.php', [
+    'title' => 'Piedpi Go Template Demo',
+    'version' => '2.0.0',
+    'items' => [
+        ['name' => 'Alpha', 'price' => 100.00, 'in_stock' => true],
+        ['name' => 'Beta', 'price' => 250.50, 'in_stock' => false],
+    ],
+    'show_debug' => true,
 ]);
 ```
 
@@ -104,11 +109,25 @@ Template syntax:
 
 | Syntax | Behavior |
 |--------|----------|
-| `{{ title }}` | Escaped output (auto-prefix `$`) |
-| `{{ $version }}` | Escaped output (explicit variable) |
-| `{!! $html }>}` | Unescaped output |
+| `{{ key }}` | Escaped variable (backward compatible) |
+| `{{ .key }}` | Go-style field access → `$data['key']` |
+| `{{ . }}` | Render entire current context |
+| `{{ if key }}...{{ end }}` | Conditional |
+| `{{ if key }}...{{ else }}...{{ end }}` | Conditional with else |
+| `{{ range key }}...{{ end }}` | Iterate array, `{{ . }}` = current item |
+| Nesting | `if` in `range`, `range` in `range`, `if` in `if` |
 
-Templates are compiled to plain PHP and cached automatically. Source file changes invalidate the cache.
+All missing variables render as empty string. HTML is auto-escaped.
+
+### Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Home page |
+| `/template` | Blade-like template demo |
+| `/template/items` | Template rendered inside loop |
+| `/template/go` | Go-like template demo |
+| `/:name` | Serve pre-built frontend from `dist/` |
 
 ## Running the Project
 

@@ -53,4 +53,28 @@ final class TemplateController
 
     Renderer::end();
   }
+
+  public function goDemo(): void
+  {
+    Renderer::start();
+
+    $items = [
+      ['name' => 'Alpha', 'price' => 100.00, 'in_stock' => true],
+      ['name' => 'Beta', 'price' => 250.50, 'in_stock' => true],
+      ['name' => 'Gamma', 'price' => 500.00, 'in_stock' => false],
+      ['name' => 'Delta', 'price' => 75.25, 'in_stock' => true],
+    ];
+
+    Renderer::goTemplate(
+      dirname(__DIR__) . '/Views/template_go_demo.php',
+      [
+        'title' => 'Piedpi Go Template Demo',
+        'version' => '2.0.0',
+        'items' => $items,
+        'show_debug' => true,
+      ]
+    );
+
+    Renderer::end();
+  }
 }
