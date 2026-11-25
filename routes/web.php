@@ -24,6 +24,7 @@ $router->get('/hello', [HomeController::class, 'hello']);
 $router->get('/about', [AboutController::class, 'index']);
 $router->get('/template', [TemplateController::class, 'index']);
 $router->get('/template/items', [TemplateController::class, 'items']);
+$router->get('/template/go', [TemplateController::class, 'goDemo']);
 
 /*
 |--------------------------------------------------------------------------
