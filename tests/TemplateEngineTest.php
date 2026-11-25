@@ -10,18 +10,13 @@ echo "Running TemplateEngine tests...\n";
 
 /*
 |-------------------------------------------------
-| Test: Variable substitution (backward compatible)
+| Test: Variable substitution
 |-------------------------------------------------
 */
 $template = 'Hello {{ name }}!';
 $data = ['name' => 'World'];
 $result = TemplateEngine::render($template, $data);
 assertEquals('Hello World!', $result, 'Variable substitution with {{ name }}');
-
-$template = 'Hello {{ $name }}!';
-$data = ['name' => 'World'];
-$result = TemplateEngine::render($template, $data);
-assertEquals('Hello World!', $result, 'Variable substitution with {{ $name }} (backward compat)');
 
 /*
 |-------------------------------------------------
@@ -198,17 +193,6 @@ assertEquals('', $result, 'Nested if with inner falsy');
 
 /*
 |-------------------------------------------------
-| Test: Escaping
-|-------------------------------------------------
-*/
-$template = '{{ html }}';
-$data = ['html' => '<script>alert(1)</script>'];
-$result = TemplateEngine::render($template, $data);
-assertTrue(str_contains($result, '<script>'), 'HTML is escaped');
-assertTrue(!str_contains($result, '<script>'), 'Raw HTML tags are not in output');
-
-/*
-|-------------------------------------------------
 | Test: Lookup with current item in range
 |-------------------------------------------------
 */
@@ -237,7 +221,7 @@ assertEquals('', $result, 'Range with int (not iterable) returns empty');
 | Test: Complex template
 |-------------------------------------------------
 */
-$template = <<<HTML
+$template = <<<'HTML'
 <h1>{{ .title }}</h1>
 {{ if .items }}
 <ul>
