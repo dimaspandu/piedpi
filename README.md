@@ -285,6 +285,8 @@ Supported syntax:
 
 All variables missing render as empty string. HTML is auto-escaped.
 
+**Compiled caching:** `Renderer::goTemplate()` caches the parsed AST (tokenize → parse result) via `TemplateCache`, keyed by the template file's content hash and modification time. Subsequent requests skip tokenization and parsing by unserializing the cached AST. Cache is invalidated automatically when the source template changes.
+
 #### Streaming With Templates
 
 Templates can be rendered inside loops for progressive HTML generation:

@@ -5,7 +5,7 @@
 ### Added
 - `TemplateEngine` class with `tokenize()`, `parse()`, `render()`, `lookup()` methods
 - AST node classes: `RootNode`, `TextNode`, `VarNode`, `IfNode`, `RangeNode`
-- `Renderer::goTemplate()` method for Go-style template rendering
+- `Renderer::goTemplate()` method for Go-style template rendering with **compiled caching**
 - Go template syntax support:
   - Variable substitution: `{{ key }}`, `{{ .key }}` (Go-style field access)
   - Context rendering: `{{ . }}` (full context or current range item)
@@ -20,6 +20,7 @@
 - Missing keys render as empty string (no errors)
 - HTML auto-escaped via `htmlspecialchars` in `VarNode`
 - Primitive data in `{{ range }}` context handled safely (returns empty)
+- `goTemplate()` caches parsed AST via `TemplateCache` (key: `gotemplate_` + md5 of filemtime + content). Subsequent requests unserialize the cached AST, skipping tokenize/parse. Cache invalidated when source changes.
 
 ### Notes
 This release adds a second template engine with Go-like syntax alongside the existing Blade-like `Renderer::template()`. Both engines coexist:

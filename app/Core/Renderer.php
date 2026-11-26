@@ -104,10 +104,21 @@ class Renderer
       throw new \RuntimeException("Template file not found: {$path}");
     }
 
-    $content = file_get_contents($path);
-    $rendered = TemplateEngine::render($content, $data);
+    $key = 'gotemplate_' . md5((string) filemtime($path) . file_get_contents($path));
 
-    echo $rendered;
+    $ast = null;
+    if ($cached = TemplateCache::get($key)) {
+      $ast = @unserialize($cached);
+    }
+
+    if (!$ast instanceof \App\Core\View\Node\RootNode) {
+      $content = file_get_contents($path);
+      $tokens = \App\Core\View\TemplateEngine::tokenize($content);
+      $ast = \App\Core\View\TemplateEngine::parse($tokens);
+      TemplateCache::put($key, serialize($ast));
+    }
+
+    echo \App\Core\View\TemplateEngine::renderNode($ast, $data);
     self::flush();
   }
 
