@@ -119,6 +119,8 @@ Template syntax:
 
 All missing variables render as empty string. HTML is auto-escaped.
 
+**Compiled caching:** `Renderer::goTemplate()` caches the parsed AST via `TemplateCache`, keyed by the template file's content hash and modification time. Subsequent requests skip tokenization and parsing by unserializing the cached AST. Cache is invalidated automatically when the source template changes.
+
 ### Routes
 
 | Route | Description |
